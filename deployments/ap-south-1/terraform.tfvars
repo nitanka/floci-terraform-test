@@ -14,6 +14,12 @@ public_subnets = [
   "10.0.3.0/24",
 ]
 
+private_subnets = [
+  "10.0.4.0/24",
+  "10.0.5.0/24",
+  "10.0.6.0/24",
+]
+
 tags = {
   Environment = "dev"
   Region      = "ap-south-1"
