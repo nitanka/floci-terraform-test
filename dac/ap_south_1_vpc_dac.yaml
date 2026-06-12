@@ -1,0 +1,183 @@
+Diagram:
+  DefinitionFiles:
+    - Type: URL
+      Url: "https://raw.githubusercontent.com/awslabs/diagram-as-code/main/definitions/definition-for-aws-icons-light.yaml"
+  Resources:
+    Canvas:
+      Type: AWS::Diagram::Canvas
+      Direction: vertical
+      Children:
+        - AWSCloud
+
+    AWSCloud:
+      Type: AWS::Diagram::Cloud
+      Direction: vertical
+      Preset: AWSCloudNoLogo
+      Align: center
+      Children:
+        - Region
+
+    Region:
+      Type: AWS::Region
+      Direction: vertical
+      Title: ap-south-1
+      Children:
+        - VPC
+
+    VPC:
+      Type: AWS::EC2::VPC
+      Direction: vertical
+      Title: Main VPC
+      Children:
+        - AZStack
+      BorderChildren:
+        - Position: N
+          Resource: InternetGateway
+        - Position: W
+          Resource: PrivateRouteTable
+        - Position: E
+          Resource: PublicRouteTable
+
+    AZStack:
+      Type: AWS::Diagram::HorizontalStack
+      Children:
+        - AZA
+        - AZB
+
+    AZA:
+      Type: AWS::EC2::AvailabilityZone
+      Direction: vertical
+      Title: ap-south-1a
+      Children:
+        - PublicSubnetA
+        - PrivateSubnetA
+
+    AZB:
+      Type: AWS::EC2::AvailabilityZone
+      Direction: vertical
+      Title: ap-south-1b
+      Children:
+        - PublicSubnetB
+        - PrivateSubnetB
+
+    PublicSubnetA:
+      Type: AWS::EC2::Subnet
+      Preset: PublicSubnet
+      Title: Public Subnet
+      Children:
+        - WebServerA
+        - NatGateway
+
+    PrivateSubnetA:
+      Type: AWS::EC2::Subnet
+      Preset: PrivateSubnet
+      Title: Private Subnet
+      Children:
+        - DbA
+        - ConsumerA
+
+    PublicSubnetB:
+      Type: AWS::EC2::Subnet
+      Preset: PublicSubnet
+      Title: Public Subnet
+      Children:
+        - WebServerB
+
+    PrivateSubnetB:
+      Type: AWS::EC2::Subnet
+      Preset: PrivateSubnet
+      Title: Private Subnet
+      Children:
+        - DbB
+        - ConsumerB
+
+    InternetGateway:
+      Type: AWS::EC2::InternetGateway
+      Title: Internet Gateway
+      IconFill:
+        Type: rect
+
+    NatGateway:
+      Type: AWS::EC2::NatGateway
+      Title: NAT Gateway
+
+    PublicRouteTable:
+      Type: AWS::EC2::RouteTable
+      Title: Public Route Table
+
+    PrivateRouteTable:
+      Type: AWS::EC2::RouteTable
+      Title: Private Route Table
+
+    WebServerA:
+      Type: AWS::EC2::Instance
+      Title: Web Server A
+
+    WebServerB:
+      Type: AWS::EC2::Instance
+      Title: Web Server B
+
+    DbA:
+      Type: AWS::EC2::Instance
+      Title: DB A
+
+    ConsumerA:
+      Type: AWS::EC2::Instance
+      Title: Consumer A
+
+    DbB:
+      Type: AWS::EC2::Instance
+      Title: DB B
+
+    ConsumerB:
+      Type: AWS::EC2::Instance
+      Title: Consumer B
+
+  Links:
+    - Source: InternetGateway
+      SourcePosition: S
+      Target: PublicRouteTable
+      TargetPosition: N
+      TargetArrowHead:
+        Type: Open
+      Type: orthogonal
+
+    - Source: PublicRouteTable
+      SourcePosition: S
+      Target: PublicSubnetA
+      TargetPosition: N
+      TargetArrowHead:
+        Type: Open
+      Type: orthogonal
+
+    - Source: PublicRouteTable
+      SourcePosition: S
+      Target: PublicSubnetB
+      TargetPosition: N
+      TargetArrowHead:
+        Type: Open
+      Type: orthogonal
+
+    - Source: NatGateway
+      SourcePosition: S
+      Target: PrivateRouteTable
+      TargetPosition: N
+      TargetArrowHead:
+        Type: Open
+      Type: orthogonal
+
+    - Source: PrivateRouteTable
+      SourcePosition: S
+      Target: PrivateSubnetA
+      TargetPosition: N
+      TargetArrowHead:
+        Type: Open
+      Type: orthogonal
+
+    - Source: PrivateRouteTable
+      SourcePosition: S
+      Target: PrivateSubnetB
+      TargetPosition: N
+      TargetArrowHead:
+        Type: Open
+      Type: orthogonal
