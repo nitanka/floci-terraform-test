@@ -3,3 +3,4 @@ keyfiles
 **/terraform.tfstate*
 .DS_Store
 **/.DS_Store
+**/.terraform.lock.hcl
