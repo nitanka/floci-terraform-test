@@ -1,4 +1,6 @@
 keyfiles
+*.pem
+*.pub
 **/.terraform
 **/terraform.tfstate*
 .DS_Store

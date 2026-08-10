@@ -1,99 +1,38 @@
-data "aws_availability_zones" "available" {
-  state = "available"
-}
+module "vpc" {
+    
+    #Initialisation
+    source                                  = "terraform-aws-modules/vpc/aws"
+    version                                 = "~> 6.6.1"
+    
+    #Basic VPC metadata
+    name                                    = var.name
+    tags                                    = local.common_tags
+    
 
-resource "aws_vpc" "main" {
-  count = var.create_vpc ? 1 : 0
+    #Network configuration
+    cidr                                    = var.cidr
+    azs                                     = local.azs
 
-  cidr_block = var.cidr
+    #Subnetting
+    private_subnets                         = var.private_subnets
+    public_subnets                          = var.public_subnets
 
-  tags = merge(var.tags, { Name = "main" })
-}
+    #Gateway and Routing
+    enable_nat_gateway                      = var.enable_nat_gateway
+    create_igw                              = var.create_igw
+    single_nat_gateway                      = var.single_nat_gateway
+    default_security_group_ingress          = var.default_security_group_igress_rules
 
-resource "aws_internet_gateway" "main" {
-  count = var.create_vpc && length(var.public_subnets) > 0 ? 1 : 0
+    #Network Audit Logs
+    enable_flow_log                         = var.enable_flow_log
+    create_flow_log_cloudwatch_iam_role     = var.create_flow_log_cloudwatch_iam_role
+    create_flow_log_cloudwatch_log_group    = var.create_flow_log_cloudwatch_log_group
+    flow_log_destination_type               = var.flow_log_destination_type
+    flow_log_destination_arn                = var.flow_log_destination_arn
+    flow_log_file_format                    = var.flow_log_file_format
 
-  vpc_id = aws_vpc.main[0].id
-
-  tags = merge(var.tags, { Name = "main-igw" })
-
-  depends_on = [ aws_vpc.main ]
-}
-
-resource "aws_subnet" "public" {
-  count = var.create_vpc ? length(var.public_subnets) : 0
-
-  vpc_id                  = aws_vpc.main[0].id
-  cidr_block              = var.public_subnets[count.index]
-  availability_zone       = length(var.availability_zones) > 0 ? var.availability_zones[count.index % length(var.availability_zones)] : data.aws_availability_zones.available.names[count.index % length(data.aws_availability_zones.available.names)]
-  map_public_ip_on_launch = true
-
-  tags = merge(var.tags, var.public_subnet_tags, {
-    Name = "public-${count.index}"
-  })
-}
-
-resource "aws_route_table" "public" {
-  count = var.create_vpc && length(var.public_subnets) > 0 ? 1 : 0
-
-  vpc_id = aws_vpc.main[0].id
-
-  route {
-    cidr_block = "0.0.0.0/0"
-    gateway_id = aws_internet_gateway.main[0].id
-  }
-
-  tags = merge(var.tags, var.public_route_table_tags, { Name = "public-rt" })
-}
-
-resource "aws_route_table_association" "public" {
-  count = var.create_vpc ? length(var.public_subnets) : 0
-
-  subnet_id      = aws_subnet.public[count.index].id
-  route_table_id = aws_route_table.public[0].id
-
-  timeouts {
-    create = "5m"
-  }
-
-  lifecycle {
-    ignore_changes = all
-  }
-}
-
-
-resource "aws_subnet" "private" {
-  count = var.create_vpc ? length(var.private_subnets) : 0
-
-  vpc_id                  = aws_vpc.main[0].id
-  cidr_block              = var.private_subnets[count.index]
-  availability_zone       = length(var.availability_zones) > 0 ? var.availability_zones[count.index % length(var.availability_zones)] : data.aws_availability_zones.available.names[count.index % length(data.aws_availability_zones.available.names)]
-  #map_public_ip_on_launch = true
-
-  tags = merge(var.tags, var.private_subnet_tags, {
-    Name = "private-${count.index}"
-  })
-}
-
-resource "aws_route_table" "private" {
-  count = var.create_vpc && length(var.private_subnets) > 0 ? 1 : 0
-
-  vpc_id = aws_vpc.main[0].id
-
-  tags = merge(var.tags, var.private_route_table_tags, { Name = "private-rt" })
-}
-
-resource "aws_route_table_association" "private" {
-  count = var.create_vpc ? length(var.private_subnets) : 0
-
-  subnet_id      = aws_subnet.private[count.index].id
-  route_table_id = aws_route_table.private[0].id
-
-  timeouts {
-    create = "5m"
-  }
-
-  lifecycle {
-    ignore_changes = all
-  }
+    #Default Resource Management
+    manage_default_security_group           = var.manage_default_security_group
+    manage_default_network_acl              = var.manage_default_network_acl
+    manage_default_route_table              = var.manage_default_route_table
 }
