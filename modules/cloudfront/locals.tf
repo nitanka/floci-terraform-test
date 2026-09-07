@@ -3,8 +3,8 @@ locals {
 
     s3_origin = {
         for idx, bucket in var.s3_bucket : "s3-origin-${idx}" => {
-            domain_name              = bucket
-            origin_access_control_id = "s3_oac"
+            domain_name               = bucket
+            origin_access_control_key = "s3_oac"
         }
     }
 

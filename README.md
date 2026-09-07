@@ -23,5 +23,8 @@ Testing Floci for testing the services supported to mock the APIs.
 
 
 **To Do**
-- Deploy the floci UI, otherwise we need to use the aws cli command or terraform commands to test the current resources. 
+- Deploy the floci UI, otherwise we need to use the aws cli command or terraform commands to test the current resources.
+
+**NOTE**
+Latest flocci image has cloudfront support, so upgrade the flocci tag to latest
 
