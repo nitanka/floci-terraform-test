@@ -28,3 +28,5 @@ Testing Floci for testing the services supported to mock the APIs.
 **NOTE**
 Latest flocci image has cloudfront support, so upgrade the flocci tag to latest
 
+Update!!
+Latest floci has fix for it, installed it using brew.
